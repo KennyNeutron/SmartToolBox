@@ -26,11 +26,11 @@ void interrupt_setup() {
 
 ISR(TIMER0_COMPA_vect) {
   cli();
-  count++;
-  if (count >= 2000) {
-    count_toggle = !count_toggle;
-    count=0;
-  }
+  // count++;
+  // if (count >= 2000) {
+  //   count_toggle = !count_toggle;
+  //   count=0;
+  // }
   PushButton_Scan();
   sei();
 }

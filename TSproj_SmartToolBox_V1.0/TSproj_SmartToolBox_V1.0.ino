@@ -6,11 +6,11 @@
 #include <U8g2lib.h>
 #include <SPI.h>
 #include "variables.h"
-
+#include "Keymapping.h"
 U8G2_ST7920_128X64_1_SW_SPI u8g2(U8G2_R0, /* clock=*/52, /* data=*/51, /* CS=*/53, /* reset=*/49);
 
 
-#define PB_test true  //for testing push button assignment
+#define PB_test false  //for testing push button assignment
 
 
 uint32_t count = 0;
