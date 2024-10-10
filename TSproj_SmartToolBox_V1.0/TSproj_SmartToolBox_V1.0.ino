@@ -37,6 +37,7 @@ void setup() {
   u8g2.begin();
 
   //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+  SPI.begin();
   mfrc522.PCD_Init();
   delay(4);
   //Show details of PCD - MFRC522 Card Reader
@@ -57,9 +58,9 @@ void loop() {
     u8g2_prepare();
 
     if (getID()) {
-      u8g2.drawStr(0, 0, tagID.c_str());
+      Serial.println("got ID");
     }
-
+    u8g2.drawStr(0, 0, tagID.c_str());
     u8g2.drawStr(10, 20, "Hello World!");
   } while (u8g2.nextPage());
 
