@@ -21,15 +21,10 @@ The stored value is then printed.
 
 #include "RFID.h"
 #include <DigitalIO.h> // our software SPI library
-
 #define SS_PIN 8
 #define RST_PIN 4
  
-RFID rfid(SS_PIN, RST_PIN); //create an instance rfid for the class RFID
 
-// varables to store data
-String cardNum;
-unsigned long RFID;
 
 void setup()
 { 
@@ -45,33 +40,3 @@ void loop()
  printRfid();
 }
 
-void readRfid()
-{
-  if (rfid.isCard())
-  {
-    if (rfid.readCardSerial())
-    {
-      for (int i=0; i<=4; i++)//card value: "xyz xyz xyz xyz xyz" (15 digits maximum; 5 pairs of xyz)hence 0<=i<=4 //
-      {
-        RFID = rfid.serNum[i];
-        cardNum += RFID; // store RFID value into string "cardNum" and concatinate it with each iteration
-      }
-    }
-  }
-  rfid.halt();
-}
-
-void printRfid()
-{
- if (cardNum != '\0')//if string cardNum is not empty, print the value
- {
-    Serial.println("Card found");
-    Serial.print("Cardnumber: ");
-    Serial.println(cardNum);
-    cardNum.remove(0);
-   //This is an arduino function.
-  //remove the stored value after printing. else the new card value that is read
-  // will be concatinated with the previous string.
-  delay(500); 
- }
-}
