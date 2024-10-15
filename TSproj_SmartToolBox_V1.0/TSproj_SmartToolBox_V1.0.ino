@@ -3,14 +3,15 @@
   10-08-2023
 */
 #include <Arduino.h>
+#include <DigitalIO.h>  // our software SPI library
 #include <U8g2lib.h>
 #include <SPI.h>
-
+#include <SD.h>
 #include "variables.h"
 #include "Keymapping.h"
 
 #include "RFID.h"
-#include <DigitalIO.h>  // our software SPI library
+
 #define SS_PIN 8
 #define RST_PIN 4
 
@@ -28,8 +29,12 @@ bool count_toggle = false;
 RFID rfid(SS_PIN, RST_PIN);  //create an instance rfid for the class RFID
 // varables to store data
 String cardNum;
-//##################################
 unsigned long RFID;
+//##################################
+
+String testStr = "rfid code here";
+
+
 
 void setup() {
   Serial.begin(9600);
@@ -53,8 +58,8 @@ void loop() {
   do {
     u8g2_prepare();
 
-    //u8g2.drawStr(0, 0, tagID.c_str());
-    u8g2.drawStr(10, 20, "Hello World!");
+    u8g2.drawStr(0, 0, testStr.c_str());
+    u8g2.drawStr(10, 20, "RFID!");
   } while (u8g2.nextPage());
 
   PB_NoPress();
@@ -82,15 +87,16 @@ void readRfid() {
 }
 
 void printRfid() {
-  if (cardNum != '\0')  //if string cardNum is not empty, print the value
-  {
-    Serial.println("Card found");
-    Serial.print("Cardnumber: ");
-    Serial.println(cardNum);
-    cardNum.remove(0);
-    //This is an arduino function.
-    //remove the stored value after printing. else the new card value that is read
-    // will be concatinated with the previous string.
-    delay(500);
-  }
+//  if (cardNum != '\0')  //if string cardNum is not empty, print the value
+//  {
+//    Serial.println("Card found");
+//    Serial.print("Cardnumber: ");
+//    Serial.println(cardNum);
+//    //testStr = cardNum;
+//    cardNum.remove(0);
+//    //This is an arduino function.
+//    //remove the stored value after printing. else the new card value that is read
+//    // will be concatinated with the previous string.
+//    delay(500);
+//  }
 }
