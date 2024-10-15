@@ -32,8 +32,10 @@ String cardNum;
 unsigned long RFID;
 //##################################
 
-String testStr = "rfid code here";
+String testStr = "blabla";
 
+const int chipSel = 53;
+File myFile;
 
 
 void setup() {
@@ -44,6 +46,24 @@ void setup() {
   Serial.println("initilizing RFID...");
   rfid.init();  // initilize the RFID module
   Serial.println("RFID start done ");
+
+  Serial.print("Initializing SD card...");
+
+  if (!SD.begin(chipSel)) {
+    Serial.println("initialization failed. Things to check:");
+    Serial.println("1. is a card inserted?");
+    Serial.println("2. is your wiring correct?");
+    Serial.println("3. did you change the chipSelect pin to match your shield or module?");
+    Serial.println("Note: press reset button on the board and reopen this Serial Monitor after fixing your issue!");
+    while (true)
+      ;
+  }
+
+  Serial.println("initialization done.");
+
+  // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.
+  myFile = SD.open("SmartToolBox.txt", FILE_WRITE);
 
   interrupt_setup();
   PushButton_Setup();
@@ -87,16 +107,27 @@ void readRfid() {
 }
 
 void printRfid() {
-//  if (cardNum != '\0')  //if string cardNum is not empty, print the value
-//  {
-//    Serial.println("Card found");
-//    Serial.print("Cardnumber: ");
-//    Serial.println(cardNum);
-//    //testStr = cardNum;
-//    cardNum.remove(0);
-//    //This is an arduino function.
-//    //remove the stored value after printing. else the new card value that is read
-//    // will be concatinated with the previous string.
-//    delay(500);
-//  }
+  if (cardNum != '\0')  //if string cardNum is not empty, print the value
+  {
+    Serial.println("Card found");
+    Serial.print("Cardnumber: ");
+    Serial.println(cardNum);
+    testStr = cardNum;
+
+
+    if (myFile) {
+      Serial.print("Writing to SmartToolBox.txt...");
+      myFile.print("RFID cardNum:");
+      myFile.println(cardNum);
+      // close the file:
+      myFile.close();
+      Serial.println("done.");
+    }
+
+    cardNum.remove(0);
+    //This is an arduino function.
+    //remove the stored value after printing. else the new card value that is read
+    // will be concatinated with the previous string.
+    delay(500);
+  }
 }
