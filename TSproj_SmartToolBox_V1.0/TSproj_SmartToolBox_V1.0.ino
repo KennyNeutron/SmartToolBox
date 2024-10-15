@@ -5,23 +5,10 @@
 #include <Arduino.h>
 #include <U8g2lib.h>
 #include <SPI.h>
-#include <MFRC522.h>
 
 #include "variables.h"
 #include "Keymapping.h"
 
-
-//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-#define SS_PIN 9
-#define RST_PIN 8
-//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-byte readCard[4];
-String MasterTag = "40263755";
-String tagID = "";
-//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-// Create instances
-MFRC522 mfrc522(SS_PIN, RST_PIN);
-//MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 
 
 U8G2_ST7920_128X64_1_SW_SPI u8g2(U8G2_R0, /* clock=*/46, /* data=*/45, /* CS=*/47, /* reset=*/49);
@@ -36,17 +23,7 @@ void setup() {
   Serial.println("SmartToolBox\nSYSTEM START...");
   u8g2.begin();
 
-  //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-  SPI.begin();
-  mfrc522.PCD_Init();
-  delay(4);
-  //Show details of PCD - MFRC522 Card Reader
-  mfrc522.PCD_DumpVersionToSerial();
-  //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
-  Serial.println("--------------------------");
-  Serial.println(" Access Control ");
-  Serial.println("Scan Your Card>>");
-  //MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+
 
   interrupt_setup();
   PushButton_Setup();
@@ -57,10 +34,7 @@ void loop() {
   do {
     u8g2_prepare();
 
-    if (getID()) {
-      Serial.println("got ID");
-    }
-    u8g2.drawStr(0, 0, tagID.c_str());
+    //    u8g2.drawStr(0, 0, tagID.c_str());
     u8g2.drawStr(10, 20, "Hello World!");
   } while (u8g2.nextPage());
 
