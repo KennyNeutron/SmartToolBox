@@ -17,7 +17,7 @@
 
 
 
-U8G2_ST7920_128X64_1_SW_SPI u8g2(U8G2_R0, /* clock=*/46, /* data=*/45, /* CS=*/47, /* reset=*/49);
+U8G2_ST7920_128X64_1_SW_SPI u8g2(U8G2_R0, /*E clock=*/46, /* RW data=*/45, /* RS CS=*/47, /* reset=*/49);
 
 #define PB_test false  //for testing push button assignment
 
@@ -48,7 +48,6 @@ void setup() {
   Serial.println("RFID start done ");
 
   Serial.print("Initializing SD card...");
-
   if (!SD.begin(chipSel)) {
     Serial.println("initialization failed. Things to check:");
     Serial.println("1. is a card inserted?");
@@ -58,15 +57,12 @@ void setup() {
     while (true)
       ;
   }
-
   Serial.println("initialization done.");
 
-  // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.
-  myFile = SD.open("SmartToolBox.txt", FILE_WRITE);
 
-  interrupt_setup();
-  PushButton_Setup();
+
+  // interrupt_setup();
+  //PushButton_Setup();
 }
 
 void loop() {
@@ -112,16 +108,22 @@ void printRfid() {
     Serial.println("Card found");
     Serial.print("Cardnumber: ");
     Serial.println(cardNum);
-    testStr = cardNum;
 
+    char buffer[7];
+    cardNum.toCharArray(buffer, 6);
 
+    String fileName = "A" + String(buffer) + "B.txt";
+    Serial.println("File Name:" + fileName);
+
+    myFile = SD.open(fileName, FILE_WRITE);
+
+    // if the file opened okay, write to it:
     if (myFile) {
-      Serial.print("Writing to SmartToolBox.txt...");
-      myFile.print("RFID cardNum:");
-      myFile.println(cardNum);
+      Serial.print("Writing to " + fileName);
+      myFile.println("Nag Scan ako ng HH:MM");
       // close the file:
       myFile.close();
-      Serial.println("done.");
+      Serial.println(" done.");
     }
 
     cardNum.remove(0);
