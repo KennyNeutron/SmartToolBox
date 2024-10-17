@@ -9,8 +9,8 @@
 #include <SD.h>
 #include "variables.h"
 #include "Keymapping.h"
-
 #include "RFID.h"
+#include <RtcDS1302.h>
 
 #define SS_PIN 8
 #define RST_PIN 4
@@ -38,16 +38,19 @@ const int chipSel = 53;
 File myFile;
 
 
+ThreeWire myWire(21, 20, 3);  // IO, SCLK, CE
+RtcDS1302<ThreeWire> Rtc(myWire);
+
 void setup() {
   Serial.begin(9600);
-  Serial.println("SmartToolBox\nSYSTEM START...");
+  Serial.println("\n\n\nSmartToolBox\nSYSTEM START...");
   u8g2.begin();
 
-  Serial.println("initilizing RFID...");
+  Serial.println("\ninitilizing RFID...");
   rfid.init();  // initilize the RFID module
   Serial.println("RFID start done ");
 
-  Serial.print("Initializing SD card...");
+  Serial.print("\nInitializing SD card...");
   if (!SD.begin(chipSel)) {
     Serial.println("initialization failed. Things to check:");
     Serial.println("1. is a card inserted?");
@@ -57,12 +60,16 @@ void setup() {
     while (true)
       ;
   }
-  Serial.println("initialization done.");
+  Serial.println("SD initialization done.");
 
-
+  Serial.println("\nInit Time Module");
+  timeModule_Setup();
+  Serial.println("TimeModule Init done!");
 
   // interrupt_setup();
   //PushButton_Setup();
+
+  Serial.println("SYSTEM INITIALIZATION DONE.... \n\nReady to SCAN...");
 }
 
 void loop() {
@@ -117,10 +124,14 @@ void printRfid() {
 
     myFile = SD.open(fileName, FILE_WRITE);
 
+    RtcDateTime now = Rtc.GetDateTime();
+    //getDateTime(now);
+
     // if the file opened okay, write to it:
     if (myFile) {
       Serial.print("Writing to " + fileName);
-      myFile.println("Nag Scan ako ng HH:MM");
+      myFile.println("\n\nNag Scan ako ng:" + getDateTime(now));
+      Serial.println("\n\n\n");
       // close the file:
       myFile.close();
       Serial.println(" done.");
