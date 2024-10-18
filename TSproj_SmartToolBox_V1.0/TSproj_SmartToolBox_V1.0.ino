@@ -20,7 +20,7 @@
 U8G2_ST7920_128X64_1_SW_SPI u8g2(U8G2_R0, /*E clock=*/46, /* RW data=*/45, /* RS CS=*/47, /* reset=*/49);
 
 #define PB_test false  //for testing push button assignment
-
+uint8_t action=0;
 uint32_t count = 0;
 bool count_toggle = false;
 
@@ -36,6 +36,7 @@ String testStr = "blabla";
 
 const int chipSel = 53;
 File myFile;
+String fileName = "BlackBox.txt";
 
 
 ThreeWire myWire(21, 20, 3);  // IO, SCLK, CE
@@ -62,6 +63,15 @@ void setup() {
   }
   Serial.println("SD initialization done.");
 
+
+  // char buffer[7];
+  // cardNum.toCharArray(buffer, 6);
+
+  // String fileName = "A" + String(buffer) + "B.txt";
+  // Serial.println("File Name:" + fileName);
+
+  myFile = SD.open(fileName, FILE_WRITE);
+
   Serial.println("\nInit Time Module");
   timeModule_Setup();
   Serial.println("TimeModule Init done!");
@@ -76,6 +86,9 @@ void loop() {
   readRfid();
   printRfid();
 
+  if (action == 1) {
+    Serial.println("WITHDRAW ITEM.... SCAN RFID");
+  }
 
   u8g2.firstPage();
   do {
@@ -116,13 +129,6 @@ void printRfid() {
     Serial.print("Cardnumber: ");
     Serial.println(cardNum);
 
-    char buffer[7];
-    cardNum.toCharArray(buffer, 6);
-
-    String fileName = "A" + String(buffer) + "B.txt";
-    Serial.println("File Name:" + fileName);
-
-    myFile = SD.open(fileName, FILE_WRITE);
 
     RtcDateTime now = Rtc.GetDateTime();
     //getDateTime(now);
@@ -130,11 +136,19 @@ void printRfid() {
     // if the file opened okay, write to it:
     if (myFile) {
       Serial.print("Writing to " + fileName);
-      myFile.println("\n\nNag Scan ako ng:" + getDateTime(now));
+      switch (action) {
+        case 1:
+          myFile.println("ITEM WITHRAWAL BY: " + cardNum);
+          myFile.println("TIME: " + getDateTime(now));
+          break;
+        default:
+          Serial.println("UNKNOWN ACTION...");
+          break;
+      }
       Serial.println("\n\n\n");
       // close the file:
       myFile.close();
-      Serial.println(" done.");
+      Serial.println("\n\ndone.");
     }
 
     cardNum.remove(0);
