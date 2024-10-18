@@ -10,8 +10,16 @@ void KeyFunctions() {
     count_toggle = !count_toggle;
   }
 
-  if(status_PB[PB_KeyA] && !buttonPressed){
-    action=1;
+  if (status_PB[PB_KeyA] && !buttonPressed) {
+    action = 1;
+  }
+
+  if (status_PB[PB_KeyB] && !buttonPressed) {
+    action = 2;
+  }
+
+  if (status_PB[PB_Key1] && action != 0 && !buttonPressed) {
+    action = (action * 10) + 1;
   }
 
   if (PB_NoPress()) {

@@ -19,8 +19,8 @@
 
 U8G2_ST7920_128X64_1_SW_SPI u8g2(U8G2_R0, /*E clock=*/46, /* RW data=*/45, /* RS CS=*/47, /* reset=*/49);
 
-#define PB_test false  //for testing push button assignment
-uint8_t action=0;
+#define PB_test true  //for testing push button assignment
+uint8_t action = 0;
 uint32_t count = 0;
 bool count_toggle = false;
 
@@ -76,8 +76,8 @@ void setup() {
   timeModule_Setup();
   Serial.println("TimeModule Init done!");
 
-  // interrupt_setup();
-  //PushButton_Setup();
+  interrupt_setup();
+  PushButton_Setup();
 
   Serial.println("SYSTEM INITIALIZATION DONE.... \n\nReady to SCAN...");
 }
@@ -85,9 +85,12 @@ void setup() {
 void loop() {
   readRfid();
   printRfid();
+  KeyFunctions();
 
   if (action == 1) {
-    Serial.println("WITHDRAW ITEM.... SCAN RFID");
+    Serial.println("WITHDRAW ITEM... PRESS THE DESIRED DRAWER (1-5)");
+  } else if (action > 10 && action < 20) {
+    Serial.println("DRAWER" + String(action - 10) + " is selected, SCAN RFID now...");
   }
 
   u8g2.firstPage();
@@ -136,19 +139,21 @@ void printRfid() {
     // if the file opened okay, write to it:
     if (myFile) {
       Serial.print("Writing to " + fileName);
-      switch (action) {
-        case 1:
-          myFile.println("ITEM WITHRAWAL BY: " + cardNum);
-          myFile.println("TIME: " + getDateTime(now));
-          break;
-        default:
-          Serial.println("UNKNOWN ACTION...");
-          break;
+      if (action > 10 && action < 20) {
+        myFile.println("ITEM WITHRAWAL BY: " + cardNum);
+        myFile.println("TIME: " + getDateTime(now));
+        myFile.println("on DRAWER#" + String(action - 10) + "\n\n\n");
+      } else if (action > 20 && action < 30) {
+        myFile.println("ITEM DEPOSIT BY: " + cardNum);
+        myFile.println("TIME: " + getDateTime(now) + "\n\n\n");
       }
+
+
       Serial.println("\n\n\n");
       // close the file:
       myFile.close();
       Serial.println("\n\ndone.");
+      action = 0;
     }
 
     cardNum.remove(0);
