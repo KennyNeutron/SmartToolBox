@@ -124,43 +124,44 @@ void loop() {
   if (action == 1) {
     if (!flag_print) {
       Serial.println("WITHDRAW ITEM... PRESS THE DESIRED DRAWER (1-5)");
-      lcd.setCursor(0, 0);
-      lcd.print("WITHDRAW ITEM");
-      lcd.setCursor(1, 0);
-      lcd.print("Select Drawer (1-5)");
       flag_print = true;
     }
+    lcd.setCursor(0, 0);
+    lcd.print("WITHDRAW ITEM");
+    lcd.setCursor(1, 0);
+    lcd.print("Select Drawer (1-5)");
   } else if (action == 2) {
     if (!flag_print) {
       Serial.println("DEPOSIT ITEM... PRESS THE DESIRED DRAWER (1-5)");
-      lcd.setCursor(0, 0);
-      lcd.print("DEPOSIT ITEM");
-      lcd.setCursor(1, 0);
-      lcd.print("Select Drawer (1-5)");
       flag_print = true;
     }
+    lcd.setCursor(0, 0);
+    lcd.print("DEPOSIT ITEM");
+    lcd.setCursor(1, 0);
+    lcd.print("Select Drawer (1-5)");
   } else if (action > 10 && action < 20) {
     if (!flag_print2) {
       Serial.println("DRAWER" + String(action - 10) + " is selected, SCAN Barcode now.. Scan RFID when done.");
-      lcd.setCursor(0, 0);
-      lcd.print("WITHDRAW ITEM on");
-      lcd.setCursor(1, 0);
-      lcd.print("Drawer"+  String(action - 10)+ " Scan Barcode");
-      lcd.setCursor(2, 0);
-      lcd.print("Scan RFID when done");
       flag_print2 = true;
     }
+    lcd.setCursor(0, 0);
+    lcd.print("WITHDRAW ITEM on");
+    lcd.setCursor(1, 0);
+    lcd.print("Drawer" + String(action - 10) + " Scan Barcode");
+    lcd.setCursor(2, 0);
+    lcd.print("Scan RFID when done");
     barcodeScan();
   } else if (action > 20 && action < 30) {
     if (!flag_print2) {
-      Serial.println("DRAWER" + String(action - 20) + " is selected, SCAN Barcode now.. Scan RFID when done.");      lcd.setCursor(0, 0);
-      lcd.print("DEPOSIT ITEM on");
-      lcd.setCursor(1, 0);
-      lcd.print("Drawer"+  String(action - 20)+ " Scan Barcode");
-      lcd.setCursor(2, 0);
-      lcd.print("Scan RFID when done");
+      Serial.println("DRAWER" + String(action - 20) + " is selected, SCAN Barcode now.. Scan RFID when done.");
       flag_print2 = true;
     }
+    lcd.setCursor(0, 0);
+    lcd.print("DEPOSIT ITEM on");
+    lcd.setCursor(1, 0);
+    lcd.print("Drawer" + String(action - 20) + " Scan Barcode");
+    lcd.setCursor(2, 0);
+    lcd.print("Scan RFID when done");
     barcodeScan();
   }
 

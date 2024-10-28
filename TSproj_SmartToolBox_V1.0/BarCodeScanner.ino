@@ -6,7 +6,9 @@ void barcodeScan() {
     }
     Serial.print("\n");
     ScannedBC = ScannedBC + "\n\tBC:" + String(scanBuffer);
-    lcd.setCursor(3, 0);
-    lcd.print("BC:" + String(scanBuffer));
+    if (action > 20) {
+      lcd.setCursor(3, 0);
+      lcd.print("BC:" + String(scanBuffer));
+    }
   }
 }
