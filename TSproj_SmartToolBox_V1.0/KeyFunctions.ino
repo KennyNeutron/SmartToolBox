@@ -28,6 +28,7 @@ void KeyFunctions() {
     buttonPressed = false;
   } else {
     buttonPressed = true;
+    lcd.clear();
   }
 }
 

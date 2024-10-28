@@ -38,8 +38,6 @@ String fileName = "BlackBox.txt";
 ThreeWire myWire(21, 20, 3);  // IO, SCLK, CE
 RtcDS1302<ThreeWire> Rtc(myWire);
 
-
-
 #include "SoftwareSerial.h"
 SoftwareSerial softSerial(12, 13);  //RX, TX: Connect Arduino pin 10 to scanner TX pin. Connect Arduino pin 11 to scanner RX pin.
 
@@ -53,11 +51,19 @@ String ScannedBC = "";
 bool flag_print = false;
 bool flag_print2 = false;
 
+
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 20, 4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+
 void setup() {
   Serial.begin(9600);
   Serial.println("\n\n\nSmartToolBox\nSYSTEM START...");
 
   //LCD Begin Here
+  lcd.init();  // initialize the lcd
+  // Print a message to the LCD.
+  lcd.backlight();
+
 
   Serial.println("\ninitilizing RFID...");
   rfid.init();  // initilize the RFID module
@@ -106,6 +112,14 @@ void loop() {
   readRfid();
   printRfid();
   KeyFunctions();
+
+
+  if (action == 0) {
+    lcd.setCursor(0, 0);
+    lcd.print("Press A - Withdraw Item");
+    lcd.setCursor(0, 1);
+    lcd.print("Press A - Withdraw Item");
+  }
 
   if (action == 1) {
     if (!flag_print) {
