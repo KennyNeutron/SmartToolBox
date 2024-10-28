@@ -106,13 +106,13 @@ void setup() {
   PushButton_Setup();
 
   Serial.println("SYSTEM INITIALIZATION DONE....\n\n\nReady to Operate");
+  flag_print = false;
 }
 
 void loop() {
   readRfid();
   printRfid();
   KeyFunctions();
-
 
   if (action == 0) {
     if (!flag_print) {
