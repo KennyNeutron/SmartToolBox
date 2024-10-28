@@ -4,7 +4,6 @@
 */
 #include <Arduino.h>
 #include <DigitalIO.h>  // our software SPI library
-#include <U8g2lib.h>
 #include <SPI.h>
 #include <SD.h>
 #include "variables.h"
@@ -15,9 +14,6 @@
 #define SS_PIN 8
 #define RST_PIN 4
 
-
-
-U8G2_ST7920_128X64_1_SW_SPI u8g2(U8G2_R0, /*E clock=*/46, /* RW data=*/45, /* RS CS=*/47, /* reset=*/49);
 
 #define PB_test false  //for testing push button assignment
 uint8_t action = 0;
@@ -60,7 +56,8 @@ bool flag_print2 = false;
 void setup() {
   Serial.begin(9600);
   Serial.println("\n\n\nSmartToolBox\nSYSTEM START...");
-  u8g2.begin();
+
+  //LCD Begin Here
 
   Serial.println("\ninitilizing RFID...");
   rfid.init();  // initilize the RFID module
@@ -136,24 +133,10 @@ void loop() {
 
   //barcodeScan();
 
-  u8g2.firstPage();
-  do {
-    u8g2_prepare();
-
-    u8g2.drawStr(0, 0, testStr.c_str());
-    u8g2.drawStr(10, 20, "RFID!");
-  } while (u8g2.nextPage());
 
   PB_NoPress();
 }
 
-void u8g2_prepare(void) {
-  u8g2.setFont(u8g2_font_6x10_tf);
-  u8g2.setFontRefHeightExtendedText();
-  u8g2.setDrawColor(1);
-  u8g2.setFontPosTop();
-  u8g2.setFontDirection(0);
-}
 
 void readRfid() {
   if (rfid.isCard()) {
