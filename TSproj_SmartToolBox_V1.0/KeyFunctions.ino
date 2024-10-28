@@ -13,22 +13,24 @@ void KeyFunctions() {
   if (status_PB[PB_KeyA] && !buttonPressed) {
     action = 1;
     ScannedBC = "";
+    lcd.clear();
   }
 
   if (status_PB[PB_KeyB] && !buttonPressed) {
     action = 2;
     ScannedBC = "";
+    lcd.clear();
   }
 
   if (action == 1 || action == 2) {
     key_WithdrawDeposit();
+    lcd.clear();
   }
 
   if (PB_NoPress()) {
     buttonPressed = false;
   } else {
     buttonPressed = true;
-    lcd.clear();
   }
 }
 

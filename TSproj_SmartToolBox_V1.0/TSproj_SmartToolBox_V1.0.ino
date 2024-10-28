@@ -116,9 +116,9 @@ void loop() {
 
   if (action == 0) {
     lcd.setCursor(0, 0);
-    lcd.print("Press A - Withdraw Item");
+    lcd.print("Press A - Withdraw ");
     lcd.setCursor(0, 1);
-    lcd.print("Press A - Withdraw Item");
+    lcd.print("Press B - Deposit");
   }
 
   if (action == 1) {
