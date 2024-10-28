@@ -19,7 +19,7 @@
 
 U8G2_ST7920_128X64_1_SW_SPI u8g2(U8G2_R0, /*E clock=*/46, /* RW data=*/45, /* RS CS=*/47, /* reset=*/49);
 
-#define PB_test true  //for testing push button assignment
+#define PB_test false  //for testing push button assignment
 uint8_t action = 0;
 uint32_t count = 0;
 bool count_toggle = false;
@@ -41,6 +41,21 @@ String fileName = "BlackBox.txt";
 
 ThreeWire myWire(21, 20, 3);  // IO, SCLK, CE
 RtcDS1302<ThreeWire> Rtc(myWire);
+
+
+
+#include "SoftwareSerial.h"
+SoftwareSerial softSerial(12, 13);  //RX, TX: Connect Arduino pin 10 to scanner TX pin. Connect Arduino pin 11 to scanner RX pin.
+
+#include "SparkFun_DE2120_Arduino_Library.h"  //Click here to get the library: http://librarymanager/All#SparkFun_DE2120
+DE2120 scanner;
+
+#define BUFFER_LEN 40
+char scanBuffer[BUFFER_LEN];
+String ScannedBC = "";
+
+bool flag_print = false;
+bool flag_print2 = false;
 
 void setup() {
   Serial.begin(9600);
@@ -76,10 +91,18 @@ void setup() {
   timeModule_Setup();
   Serial.println("TimeModule Init done!");
 
+  Serial.println("\nDE2120 Scanner Initializing...");
+  if (scanner.begin(softSerial) == false) {
+    Serial.println("Scanner did not respond. Please check wiring. Did you scan the POR232 barcode? Freezing...");
+    while (1)
+      ;
+  }
+  Serial.println("Scanner online!");
+
   interrupt_setup();
   PushButton_Setup();
 
-  Serial.println("SYSTEM INITIALIZATION DONE.... \n\nReady to SCAN...");
+  Serial.println("SYSTEM INITIALIZATION DONE....\n\n\nReady to Operate");
 }
 
 void loop() {
@@ -88,10 +111,30 @@ void loop() {
   KeyFunctions();
 
   if (action == 1) {
-    Serial.println("WITHDRAW ITEM... PRESS THE DESIRED DRAWER (1-5)");
+    if (!flag_print) {
+      Serial.println("WITHDRAW ITEM... PRESS THE DESIRED DRAWER (1-5)");
+      flag_print = true;
+    }
+  } else if (action == 2) {
+    if (!flag_print) {
+      Serial.println("DEPOSIT ITEM... PRESS THE DESIRED DRAWER (1-5)");
+      flag_print = true;
+    }
   } else if (action > 10 && action < 20) {
-    Serial.println("DRAWER" + String(action - 10) + " is selected, SCAN RFID now...");
+    if (!flag_print2) {
+      Serial.println("DRAWER" + String(action - 10) + " is selected, SCAN Barcode now.. Scan RFID when done.");
+      flag_print2 = true;
+    }
+    barcodeScan();
+  } else if (action > 20 && action < 30) {
+    if (!flag_print2) {
+      Serial.println("DRAWER" + String(action - 20) + " is selected, SCAN Barcode now.. Scan RFID when done.");
+      flag_print2 = true;
+    }
+    barcodeScan();
   }
+
+  //barcodeScan();
 
   u8g2.firstPage();
   do {
@@ -138,16 +181,21 @@ void printRfid() {
 
     // if the file opened okay, write to it:
     if (myFile) {
-      Serial.print("Writing to " + fileName);
+      Serial.println("Scanned BC: \n" + ScannedBC);
+      Serial.print("\nWriting to " + fileName);
+      myFile.println("\n\n===========================================");
       if (action > 10 && action < 20) {
         myFile.println("ITEM WITHRAWAL BY: " + cardNum);
         myFile.println("TIME: " + getDateTime(now));
-        myFile.println("on DRAWER#" + String(action - 10) + "\n\n\n");
+        myFile.println("on DRAWER#" + String(action - 10));
       } else if (action > 20 && action < 30) {
         myFile.println("ITEM DEPOSIT BY: " + cardNum);
-        myFile.println("TIME: " + getDateTime(now) + "\n\n\n");
+        myFile.println("on DRAWER#" + String(action - 20));
+        myFile.println("TIME: " + getDateTime(now));
       }
-
+      myFile.println("ITEMS:\n");
+      myFile.println(ScannedBC);
+      myFile.println("===========================================");
 
       Serial.println("\n\n\n");
       // close the file:

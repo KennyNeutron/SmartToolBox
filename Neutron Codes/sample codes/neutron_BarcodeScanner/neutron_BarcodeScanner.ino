@@ -14,7 +14,7 @@
   To connect the barcode scanner to an Arduino:
 
   (Arduino pin) = (Scanner pin)
-  2 = TX pin on scanner
+  2 = TX pin on scannerM
   3 = RX pin on scanner
   GND = GND
   3.3V = 3.3V
@@ -22,7 +22,7 @@
 */
 
 #include "SoftwareSerial.h"
-SoftwareSerial softSerial(10, 11); //RX, TX: Connect Arduino pin 10 to scanner TX pin. Connect Arduino pin 11 to scanner RX pin.
+SoftwareSerial softSerial(12, 13); //RX, TX: Connect Arduino pin 10 to scanner TX pin. Connect Arduino pin 11 to scanner RX pin.
 
 #include "SparkFun_DE2120_Arduino_Library.h" //Click here to get the library: http://librarymanager/All#SparkFun_DE2120
 DE2120 scanner;
