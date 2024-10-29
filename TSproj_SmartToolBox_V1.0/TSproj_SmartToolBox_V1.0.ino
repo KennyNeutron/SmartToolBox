@@ -108,9 +108,7 @@ void setup() {
 
   Serial.println("SYSTEM INITIALIZATION DONE....\n\n\nReady to Operate");
 
-  //test Relay
-  pinMode(A0, OUTPUT);
-  digitalWrite(A0, HIGH);
+  solenoid_setup();
 }
 
 void loop() {
@@ -124,6 +122,7 @@ void loop() {
     lcd.print("Press A - Withdraw ");
     lcd.setCursor(0, 1);
     lcd.print("Press B - Deposit");
+    solenoidCloseAll();
   }
 
   if (action == 1) {
@@ -149,6 +148,7 @@ void loop() {
   } else if (action > 10 && action < 20) {
     if (!flag_print2) {
       Serial.println("DRAWER" + String(action - 10) + " is selected, SCAN Barcode now.. Scan RFID when done.");
+      solenoidOpen(action - 10);
       flag_print2 = true;
       lcd.clear();
       lcd.setCursor(0, 0);
@@ -162,6 +162,7 @@ void loop() {
   } else if (action > 20 && action < 30) {
     if (!flag_print2) {
       Serial.println("DRAWER" + String(action - 20) + " is selected, SCAN Barcode now.. Scan RFID when done.");
+      solenoidOpen(action - 20);
       flag_print2 = true;
       lcd.clear();
       lcd.setCursor(0, 0);
