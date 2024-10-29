@@ -55,6 +55,7 @@ bool flag_print2 = false;
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 20, 4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
+
 void setup() {
   Serial.begin(9600);
   Serial.println("\n\n\nSmartToolBox\nSYSTEM START...");
@@ -115,10 +116,10 @@ void loop() {
 
 
   if (action == 0) {
-    lcd.setCursor(0, 0);
-    lcd.print("Press A - Withdraw ");
-    lcd.setCursor(0, 1);
-    lcd.print("Press B - Deposit");
+      lcd.setCursor(0, 0);
+      lcd.print("Press A - Withdraw ");
+      lcd.setCursor(0, 1);
+      lcd.print("Press B - Deposit");
   }
 
   if (action == 1) {
@@ -135,34 +136,38 @@ void loop() {
     if (!flag_print) {
       Serial.println("DEPOSIT ITEM... PRESS THE DESIRED DRAWER (1-5)");
       flag_print = true;
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("DEPOSIT ITEM");
+      lcd.setCursor(0, 1);
+      lcd.print("Select Drawer (1-5)");
     }
-    lcd.setCursor(0, 0);
-    lcd.print("DEPOSIT ITEM");
-    lcd.setCursor(1, 0);
-    lcd.print("Select Drawer (1-5)");
   } else if (action > 10 && action < 20) {
     if (!flag_print2) {
       Serial.println("DRAWER" + String(action - 10) + " is selected, SCAN Barcode now.. Scan RFID when done.");
       flag_print2 = true;
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("WITHDRAW ITEM on");
+      lcd.setCursor(0, 1);
+      lcd.print("Drawer" + String(action - 10) + " Scan Barcode");
+      lcd.setCursor(0, 2);
+      lcd.print("Scan RFID when done");
     }
-    lcd.setCursor(0, 0);
-    lcd.print("WITHDRAW ITEM on");
-    lcd.setCursor(1, 0);
-    lcd.print("Drawer" + String(action - 10) + " Scan Barcode");
-    lcd.setCursor(2, 0);
-    lcd.print("Scan RFID when done");
     barcodeScan();
   } else if (action > 20 && action < 30) {
     if (!flag_print2) {
       Serial.println("DRAWER" + String(action - 20) + " is selected, SCAN Barcode now.. Scan RFID when done.");
       flag_print2 = true;
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("DEPOSIT ITEM on");
+      lcd.setCursor(0, 1);
+      lcd.print("Drawer" + String(action - 20) + " Scan Barcode");
+      lcd.setCursor(0, 2);
+      lcd.print("Scan RFID when done");
     }
-    lcd.setCursor(0, 0);
-    lcd.print("DEPOSIT ITEM on");
-    lcd.setCursor(1, 0);
-    lcd.print("Drawer" + String(action - 20) + " Scan Barcode");
-    lcd.setCursor(2, 0);
-    lcd.print("Scan RFID when done");
+
     barcodeScan();
   }
 
@@ -192,6 +197,7 @@ void printRfid() {
     Serial.println("Card found");
     Serial.print("Cardnumber: ");
     Serial.println(cardNum);
+    lcd.clear();
 
 
     RtcDateTime now = Rtc.GetDateTime();
