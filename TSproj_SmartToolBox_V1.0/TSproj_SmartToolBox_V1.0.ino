@@ -125,11 +125,12 @@ void loop() {
     if (!flag_print) {
       Serial.println("WITHDRAW ITEM... PRESS THE DESIRED DRAWER (1-5)");
       flag_print = true;
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("WITHDRAW ITEM");
+      lcd.setCursor(0, 1);
+      lcd.print("Select Drawer (1-5)");
     }
-    lcd.setCursor(0, 0);
-    lcd.print("WITHDRAW ITEM");
-    lcd.setCursor(1, 0);
-    lcd.print("Select Drawer (1-5)");
   } else if (action == 2) {
     if (!flag_print) {
       Serial.println("DEPOSIT ITEM... PRESS THE DESIRED DRAWER (1-5)");
