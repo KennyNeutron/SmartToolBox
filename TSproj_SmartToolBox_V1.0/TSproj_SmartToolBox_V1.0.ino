@@ -50,7 +50,7 @@ String ScannedBC = "";
 
 bool flag_print = false;
 bool flag_print2 = false;
-
+bool flag_print3 = false;
 
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 20, 4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
@@ -107,6 +107,10 @@ void setup() {
   PushButton_Setup();
 
   Serial.println("SYSTEM INITIALIZATION DONE....\n\n\nReady to Operate");
+
+  //test Relay
+  pinMode(A0, OUTPUT);
+  digitalWrite(A0, HIGH);
 }
 
 void loop() {
@@ -116,10 +120,10 @@ void loop() {
 
 
   if (action == 0) {
-      lcd.setCursor(0, 0);
-      lcd.print("Press A - Withdraw ");
-      lcd.setCursor(0, 1);
-      lcd.print("Press B - Deposit");
+    lcd.setCursor(0, 0);
+    lcd.print("Press A - Withdraw ");
+    lcd.setCursor(0, 1);
+    lcd.print("Press B - Deposit");
   }
 
   if (action == 1) {
@@ -169,6 +173,17 @@ void loop() {
     }
 
     barcodeScan();
+  } else if (action == 100) {
+    if (!flag_print3) {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Press D to");
+      lcd.setCursor(0, 1);
+      lcd.print("start NEW");
+      lcd.setCursor(0, 2);
+      lcd.print("transaction");
+      flag_print3 = true;
+    }
   }
 
   //barcodeScan();
@@ -197,7 +212,7 @@ void printRfid() {
     Serial.println("Card found");
     Serial.print("Cardnumber: ");
     Serial.println(cardNum);
-    lcd.clear();
+    action = 100;
 
 
     RtcDateTime now = Rtc.GetDateTime();

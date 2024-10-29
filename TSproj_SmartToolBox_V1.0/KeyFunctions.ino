@@ -20,6 +20,12 @@ void KeyFunctions() {
     ScannedBC = "";
   }
 
+  if (status_PB[PB_KeyD] && !buttonPressed) {
+    flag_print3 = false;
+    action = 0;
+    lcd.clear();
+  }
+
   if (action == 1 || action == 2) {
     key_WithdrawDeposit();
   }
