@@ -24,6 +24,7 @@ void KeyFunctions() {
     flag_print3 = false;
     action = 0;
     lcd.clear();
+    VariableReset();
   }
 
   if (action == 1 || action == 2) {
