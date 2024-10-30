@@ -213,8 +213,6 @@ void printRfid() {
     Serial.println("Card found");
     Serial.print("Cardnumber: ");
     Serial.println(cardNum);
-    action = 100;
-
 
     RtcDateTime now = Rtc.GetDateTime();
     //getDateTime(now);
@@ -241,7 +239,7 @@ void printRfid() {
       // close the file:
       myFile.close();
       Serial.println("\n\ndone.");
-      action = 0;
+      action = 100;
     }
 
     cardNum.remove(0);
