@@ -6,16 +6,16 @@ bool buttonPressed = false;
   Action 1 : WITHDRAW
 */
 void KeyFunctions() {
-  if (status_PB[PB_KeyAsterisk] && !buttonPressed) {
-    count_toggle = !count_toggle;
-  }
+  // if (status_PB[PB_KeyAsterisk] && !buttonPressed) {
+  //   count_toggle = !count_toggle;
+  // }
 
-  if (status_PB[PB_KeyA] && !buttonPressed) {
+  if (status_PB[PB_KeyA] && !buttonPressed && action == 0) {
     action = 1;
     ScannedBC = "";
   }
 
-  if (status_PB[PB_KeyB] && !buttonPressed) {
+  if (status_PB[PB_KeyB] && !buttonPressed && action == 0) {
     action = 2;
     ScannedBC = "";
   }

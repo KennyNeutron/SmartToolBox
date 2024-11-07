@@ -9,7 +9,10 @@
 #include "variables.h"
 #include "Keymapping.h"
 #include "RFID.h"
-#include <RtcDS1302.h>
+//#include <RtcDS1302.h>
+//#include <virtuabotixRTC.h>
+#include <Wire.h>
+#include <DS3231.h>
 
 #define SS_PIN 8
 #define RST_PIN 4
@@ -35,8 +38,8 @@ File myFile;
 String fileName = "BlackBox.txt";
 
 
-ThreeWire myWire(21, 20, 3);  // IO, SCLK, CE
-RtcDS1302<ThreeWire> Rtc(myWire);
+//ThreeWire myWire(21, 20, 3);  // IO, SCLK, CE
+//RtcDS1302<ThreeWire> Rtc(myWire);
 
 #include "SoftwareSerial.h"
 SoftwareSerial softSerial(12, 13);  //RX, TX: Connect Arduino pin 10 to scanner TX pin. Connect Arduino pin 11 to scanner RX pin.
@@ -92,7 +95,9 @@ void setup() {
   myFile = SD.open(fileName, FILE_WRITE);
 
   Serial.println("\nInit Time Module");
-  timeModule_Setup();
+  //timeModule_Setup();
+  //ds3231_setTime(24,11,7,5,11,0,0); //PARAMETERS: [year(2digits)],[month],[date],[DOW],[hour],[minute],[second]
+  ds3231_printTime();
   Serial.println("TimeModule Init done!");
 
   Serial.println("\nDE2120 Scanner Initializing...");
@@ -109,9 +114,15 @@ void setup() {
   Serial.println("SYSTEM INITIALIZATION DONE....\n\n\nReady to Operate");
 
   solenoid_setup();
+
+  // RtcDateTime now = Rtc.GetDateTime();
+  // Serial.print("TIME:");
+  // Serial.println(getDateTime(now));
 }
 
 void loop() {
+  // Serial.println("TIME:" + ds3231_getTime());
+  // Serial.println("DATE:" + ds3231_getDate());
   readRfid();
   printRfid();
   KeyFunctions();
@@ -214,7 +225,7 @@ void printRfid() {
     Serial.print("Cardnumber: ");
     Serial.println(cardNum);
 
-    RtcDateTime now = Rtc.GetDateTime();
+    //RtcDateTime now = Rtc.GetDateTime();
     //getDateTime(now);
 
     // if the file opened okay, write to it:
@@ -224,17 +235,21 @@ void printRfid() {
       myFile.println("\n\n===========================================");
       if (action > 10 && action < 20) {
         myFile.println("ITEM WITHRAWAL BY: " + cardNum);
-        myFile.println("TIME: " + getDateTime(now));
+        //myFile.println("TIME: " + getDateTime(now));
+        myFile.println("TIME:" + ds3231_getTime());
+        myFile.println("DATE:" + ds3231_getDate());
+
         myFile.println("on DRAWER#" + String(action - 10));
       } else if (action > 20 && action < 30) {
         myFile.println("ITEM DEPOSIT BY: " + cardNum);
         myFile.println("on DRAWER#" + String(action - 20));
-        myFile.println("TIME: " + getDateTime(now));
+        myFile.println("TIME:" + ds3231_getTime());
+        myFile.println("DATE:" + ds3231_getDate());
+        //myFile.println("TIME: " + getDateTime(now));
       }
       myFile.println("ITEMS:\n");
       myFile.println(ScannedBC);
       myFile.println("===========================================");
-
       Serial.println("\n\n\n");
       // close the file:
       myFile.close();
