@@ -14,14 +14,6 @@
 #include <Wire.h>
 #include <DS3231.h>
 
-#define SS_PIN 8
-#define RST_PIN 4
-
-
-#define PB_test false  //for testing push button assignment
-uint8_t action = 0;
-uint32_t count = 0;
-bool count_toggle = false;
 
 //##################################
 //RFID
@@ -58,7 +50,7 @@ bool flag_print3 = false;
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 20, 4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
-
+uint32_t last_millis = 0;
 void setup() {
   Serial.begin(9600);
   Serial.println("\n\n\nSmartToolBox\nSYSTEM START...");
@@ -95,8 +87,7 @@ void setup() {
   myFile = SD.open(fileName, FILE_WRITE);
 
   Serial.println("\nInit Time Module");
-  //timeModule_Setup();
-  //ds3231_setTime(24,11,7,5,11,0,0); //PARAMETERS: [year(2digits)],[month],[date],[DOW],[hour],[minute],[second]
+  //ds3231_setTime(24,11,8,6,10,50,0); //PARAMETERS: [year(2digits)],[month],[date],[DOW],[hour],[minute],[second]
   ds3231_printTime();
   Serial.println("TimeModule Init done!");
 
@@ -114,10 +105,7 @@ void setup() {
   Serial.println("SYSTEM INITIALIZATION DONE....\n\n\nReady to Operate");
 
   solenoid_setup();
-
-  // RtcDateTime now = Rtc.GetDateTime();
-  // Serial.print("TIME:");
-  // Serial.println(getDateTime(now));
+  last_millis = millis();
 }
 
 void loop() {
@@ -126,81 +114,37 @@ void loop() {
   readRfid();
   printRfid();
   KeyFunctions();
-
-
-  if (action == 0) {
+  if (Transaction_Cancelled) {
     lcd.setCursor(0, 0);
-    lcd.print("Press A - Withdraw ");
+    lcd.print("TRANSACTION");
     lcd.setCursor(0, 1);
-    lcd.print("Press B - Deposit");
-    solenoidCloseAll();
-  }
-
-  if (action == 1) {
-    if (!flag_print) {
-      Serial.println("WITHDRAW ITEM... PRESS THE DESIRED DRAWER (1-5)");
-      flag_print = true;
-      lcd.clear();
+    lcd.print("CANCELLED!");
+    lcd.setCursor(0, 2);
+    lcd.print("Press C to Continue");
+    CancelledTransaction();
+  } else {
+    if (!RFID_scanned) {
       lcd.setCursor(0, 0);
-      lcd.print("WITHDRAW ITEM");
+      lcd.print("SCAN RFID TO START");
       lcd.setCursor(0, 1);
-      lcd.print("Select Drawer (1-5)");
-    }
-  } else if (action == 2) {
-    if (!flag_print) {
-      Serial.println("DEPOSIT ITEM... PRESS THE DESIRED DRAWER (1-5)");
-      flag_print = true;
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("DEPOSIT ITEM");
-      lcd.setCursor(0, 1);
-      lcd.print("Select Drawer (1-5)");
-    }
-  } else if (action > 10 && action < 20) {
-    if (!flag_print2) {
-      Serial.println("DRAWER" + String(action - 10) + " is selected, SCAN Barcode now.. Scan RFID when done.");
-      solenoidOpen(action - 10);
-      flag_print2 = true;
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("WITHDRAW ITEM on");
-      lcd.setCursor(0, 1);
-      lcd.print("Drawer" + String(action - 10) + " Scan Barcode");
+      lcd.print("A TRANSACTION");
       lcd.setCursor(0, 2);
-      lcd.print("Scan RFID when done");
-    }
-    barcodeScan();
-  } else if (action > 20 && action < 30) {
-    if (!flag_print2) {
-      Serial.println("DRAWER" + String(action - 20) + " is selected, SCAN Barcode now.. Scan RFID when done.");
-      solenoidOpen(action - 20);
-      flag_print2 = true;
-      lcd.clear();
+      lcd.print("                    "); //20 blank
+    } else {
       lcd.setCursor(0, 0);
-      lcd.print("DEPOSIT ITEM on");
+      lcd.print("RFID DETECTED");
       lcd.setCursor(0, 1);
-      lcd.print("Drawer" + String(action - 20) + " Scan Barcode");
+      lcd.print(this_RFID_scanned);
       lcd.setCursor(0, 2);
-      lcd.print("Scan RFID when done");
-    }
-
-    barcodeScan();
-  } else if (action == 100) {
-    if (!flag_print3) {
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Press D to");
-      lcd.setCursor(0, 1);
-      lcd.print("start NEW");
-      lcd.setCursor(0, 2);
-      lcd.print("transaction");
-      flag_print3 = true;
+      lcd.print("PRESS");
+      lcd.setCursor(6, 2);
+      lcd.print("[C]-Cancel");
+      lcd.setCursor(0, 3);
+      lcd.print("A-Withdraw B-Deposit");
     }
   }
 
   //barcodeScan();
-
-
   PB_NoPress();
 }
 
@@ -213,6 +157,10 @@ void readRfid() {
         RFID = rfid.serNum[i];
         cardNum += RFID;  // store RFID value into string "cardNum" and concatinate it with each iteration
       }
+      this_RFID_scanned = cardNum;
+      RFID_scanned = true;
+      lcd.clear();
+      this_scan_TimeStamp = "TIME:" + ds3231_getTime() + "\nDATE:" + ds3231_getDate();
     }
   }
   rfid.halt();
@@ -225,42 +173,10 @@ void printRfid() {
     Serial.print("Cardnumber: ");
     Serial.println(cardNum);
 
-    //RtcDateTime now = Rtc.GetDateTime();
-    //getDateTime(now);
-
-    // if the file opened okay, write to it:
-    if (myFile) {
-      Serial.println("Scanned BC: \n" + ScannedBC);
-      Serial.print("\nWriting to " + fileName);
-      myFile.println("\n\n===========================================");
-      if (action > 10 && action < 20) {
-        myFile.println("ITEM WITHRAWAL BY: " + cardNum);
-        //myFile.println("TIME: " + getDateTime(now));
-        myFile.println("TIME:" + ds3231_getTime());
-        myFile.println("DATE:" + ds3231_getDate());
-
-        myFile.println("on DRAWER#" + String(action - 10));
-      } else if (action > 20 && action < 30) {
-        myFile.println("ITEM DEPOSIT BY: " + cardNum);
-        myFile.println("on DRAWER#" + String(action - 20));
-        myFile.println("TIME:" + ds3231_getTime());
-        myFile.println("DATE:" + ds3231_getDate());
-        //myFile.println("TIME: " + getDateTime(now));
-      }
-      myFile.println("ITEMS:\n");
-      myFile.println(ScannedBC);
-      myFile.println("===========================================");
-      Serial.println("\n\n\n");
-      // close the file:
-      myFile.close();
-      Serial.println("\n\ndone.");
-      action = 100;
-    }
-
     cardNum.remove(0);
     //This is an arduino function.
     //remove the stored value after printing. else the new card value that is read
     // will be concatinated with the previous string.
-    delay(500);
+    delay(50);
   }
 }
