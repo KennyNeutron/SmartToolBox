@@ -15,6 +15,19 @@ void solenoid_setup() {
   solenoidCloseAll();
 }
 
+void solenoidOpenAll(){
+  solenoidOpen(1);
+  delay(1000);
+  solenoidOpen(2);
+  delay(1000);
+  solenoidOpen(3);
+  delay(1000);
+  solenoidOpen(4);
+  delay(1000);
+  solenoidOpen(5);
+  delay(1000);
+}
+
 void solenoidCloseAll() {
   solenoidClose(1);
   delay(300);

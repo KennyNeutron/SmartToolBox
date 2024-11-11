@@ -8,7 +8,7 @@ bool status_PB[18];  //16+2 just to be sure
 #define RST_PIN 4
 
 
-#define PB_test false  //for testing push button assignment
+#define PB_test true  //for testing push button assignment
 bool RFID_scanned = false;
 bool Transaction_Cancelled= false;
 

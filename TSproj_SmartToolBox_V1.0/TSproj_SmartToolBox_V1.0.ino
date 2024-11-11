@@ -101,6 +101,7 @@ void setup() {
   solenoid_setup();
   last_millis = millis();
   Serial.println("SYSTEM INITIALIZATION DONE....\n\n\nReady to Operate");
+  //solenoidOpenAll();
 }
 
 void loop() {
@@ -141,12 +142,22 @@ void loop() {
             lcd.setCursor(0, 3);
             lcd.print("A-Withdraw B-Deposit");
           }
-          if (transact_Withdraw) {
+          if (transact_Withdraw && !transact_Deposit) {
             barcodeScan();
             if (!display_flag) {
               lcd.clear();
               lcd.setCursor(0, 0);
               lcd.print("Withdraw Item on D#?");
+              lcd.setCursor(0, 1);
+              lcd.print("Select Drawer #");
+              display_flag = true;
+            }
+          } else if (!transact_Withdraw && transact_Deposit) {
+            barcodeScan();
+            if (!display_flag) {
+              lcd.clear();
+              lcd.setCursor(0, 0);
+              lcd.print("Deposit Item on D#?");
               lcd.setCursor(0, 1);
               lcd.print("Select Drawer #");
               display_flag = true;

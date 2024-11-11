@@ -39,7 +39,7 @@ void FinishedTransaction() {
     if (transact_Withdraw && !transact_Deposit) {
       myFile.println("TYPE: Item Withdrawal");
       myFile.println("Drawer: #" + String(DrawerOfConcern));
-    } else if (transact_Withdraw && !transact_Deposit) {
+    } else if (!transact_Withdraw && transact_Deposit) {
       myFile.println("TYPE: Item Deposit");
       myFile.println("Drawer: #" + String(DrawerOfConcern));
     }
