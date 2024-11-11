@@ -29,7 +29,6 @@ const int chipSel = 53;
 File myFile;
 String fileName = "BlackBox.txt";
 
-
 //ThreeWire myWire(21, 20, 3);  // IO, SCLK, CE
 //RtcDS1302<ThreeWire> Rtc(myWire);
 
@@ -43,9 +42,6 @@ DE2120 scanner;
 char scanBuffer[BUFFER_LEN];
 String ScannedBC = "";
 
-bool flag_print = false;
-bool flag_print2 = false;
-bool flag_print3 = false;
 
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 20, 4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
@@ -102,46 +98,82 @@ void setup() {
   interrupt_setup();
   PushButton_Setup();
 
-  Serial.println("SYSTEM INITIALIZATION DONE....\n\n\nReady to Operate");
-
   solenoid_setup();
   last_millis = millis();
+  Serial.println("SYSTEM INITIALIZATION DONE....\n\n\nReady to Operate");
 }
 
 void loop() {
   // Serial.println("TIME:" + ds3231_getTime());
   // Serial.println("DATE:" + ds3231_getDate());
+  //Serial.println("looping");
   readRfid();
   printRfid();
   KeyFunctions();
-  if (Transaction_Cancelled) {
-    lcd.setCursor(0, 0);
-    lcd.print("TRANSACTION");
-    lcd.setCursor(0, 1);
-    lcd.print("CANCELLED!");
-    lcd.setCursor(0, 2);
-    lcd.print("Press C to Continue");
-    CancelledTransaction();
-  } else {
-    if (!RFID_scanned) {
-      lcd.setCursor(0, 0);
-      lcd.print("SCAN RFID TO START");
-      lcd.setCursor(0, 1);
-      lcd.print("A TRANSACTION");
-      lcd.setCursor(0, 2);
-      lcd.print("                    "); //20 blank
-    } else {
-      lcd.setCursor(0, 0);
-      lcd.print("RFID DETECTED");
-      lcd.setCursor(0, 1);
-      lcd.print(this_RFID_scanned);
-      lcd.setCursor(0, 2);
-      lcd.print("PRESS");
-      lcd.setCursor(6, 2);
-      lcd.print("[C]-Cancel");
-      lcd.setCursor(0, 3);
-      lcd.print("A-Withdraw B-Deposit");
-    }
+
+  switch (DoneCount) {
+    case 0:
+      if (Transaction_Cancelled) {
+        lcd.setCursor(0, 0);
+        lcd.print("TRANSACTION");
+        lcd.setCursor(0, 1);
+        lcd.print("CANCELLED!");
+        lcd.setCursor(0, 2);
+        lcd.print("Press C to Continue");
+      } else {
+        if (!RFID_scanned) {
+          lcd.setCursor(0, 0);
+          lcd.print("SCAN RFID TO START");
+          lcd.setCursor(0, 1);
+          lcd.print("A TRANSACTION");
+          lcd.setCursor(0, 2);
+          lcd.print("                    ");  //20 blank
+        } else {
+          if (!transact_Withdraw && !transact_Deposit) {
+            lcd.setCursor(0, 0);
+            lcd.print("RFID DETECTED");
+            lcd.setCursor(0, 1);
+            lcd.print(this_RFID_scanned);
+            lcd.setCursor(0, 2);
+            lcd.print("PRESS");
+            lcd.setCursor(6, 2);
+            lcd.print("[C]-Cancel");
+            lcd.setCursor(0, 3);
+            lcd.print("A-Withdraw B-Deposit");
+          }
+          if (transact_Withdraw) {
+            barcodeScan();
+            if (!display_flag) {
+              lcd.clear();
+              lcd.setCursor(0, 0);
+              lcd.print("Withdraw Item on D#?");
+              lcd.setCursor(0, 1);
+              lcd.print("Select Drawer #");
+              display_flag = true;
+            }
+          }
+        }
+      }
+      break;
+
+    case 1:
+      if (!display_flag) {
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Transaction DONE!");
+        lcd.setCursor(0, 1);
+        lcd.print("Press D again");
+        lcd.setCursor(0, 2);
+        lcd.print("to start a new");
+        lcd.setCursor(0, 3);
+        lcd.print("Transaction");
+        Serial.println("TRANSACTION Done!");
+        display_flag = true;
+      }
+      break;
+    default:
+      VariableReset();
+      break;
   }
 
   //barcodeScan();
@@ -150,14 +182,16 @@ void loop() {
 
 
 void readRfid() {
-  if (rfid.isCard()) {
+  if (rfid.isCard() && !RFID_scanned) {
     if (rfid.readCardSerial()) {
       for (int i = 0; i <= 4; i++)  //card value: "xyz xyz xyz xyz xyz" (15 digits maximum; 5 pairs of xyz)hence 0<=i<=4 //
       {
         RFID = rfid.serNum[i];
         cardNum += RFID;  // store RFID value into string "cardNum" and concatinate it with each iteration
       }
+      Serial.println("RFID ID Scanned:" + cardNum);
       this_RFID_scanned = cardNum;
+      cardNum = "";
       RFID_scanned = true;
       lcd.clear();
       this_scan_TimeStamp = "TIME:" + ds3231_getTime() + "\nDATE:" + ds3231_getDate();

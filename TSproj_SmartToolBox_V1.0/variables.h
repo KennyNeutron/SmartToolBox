@@ -9,9 +9,18 @@ bool status_PB[18];  //16+2 just to be sure
 
 
 #define PB_test false  //for testing push button assignment
-uint8_t action = 0;
 bool RFID_scanned = false;
 bool Transaction_Cancelled= false;
 
 String this_RFID_scanned="";
 String this_scan_TimeStamp="";
+
+
+bool transact_Withdraw=false;
+bool transact_Deposit = false;
+
+bool display_flag=false;
+
+uint8_t DoneCount=0;
+
+uint8_t DrawerOfConcern=0;

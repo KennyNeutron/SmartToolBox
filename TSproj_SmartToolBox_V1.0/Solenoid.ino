@@ -17,10 +17,15 @@ void solenoid_setup() {
 
 void solenoidCloseAll() {
   solenoidClose(1);
+  delay(300);
   solenoidClose(2);
+  delay(300);
   solenoidClose(3);
+  delay(300);
   solenoidClose(4);
+  delay(300);
   solenoidClose(5);
+  delay(300);
 }
 
 
@@ -43,6 +48,7 @@ void solenoidOpen(uint8_t solNum) {
       digitalWrite(sol5, LOW);
       break;
   }
+  Serial.println("***Opening Solenoid #" + String(solNum));
 }
 
 void solenoidClose(uint8_t solNum) {
@@ -63,4 +69,5 @@ void solenoidClose(uint8_t solNum) {
       digitalWrite(sol5, HIGH);
       break;
   }
+  Serial.println("***Closing Solenoid #" + String(solNum));
 }

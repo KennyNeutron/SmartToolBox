@@ -8,5 +8,6 @@ void barcodeScan() {
     ScannedBC = ScannedBC + "\n\tBC:" + String(scanBuffer);
     lcd.setCursor(0, 3);
     lcd.print("BC:" + String(scanBuffer));
+    this_scan_TimeStamp = this_scan_TimeStamp + "\nBC:" + String(scanBuffer);
   }
 }

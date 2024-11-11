@@ -1,15 +1,17 @@
 void VariableReset() {
   RFID_scanned = false;
+  Transaction_Cancelled = false;
+
   this_RFID_scanned = "";
   this_scan_TimeStamp = "";
 
 
-  action = 0;
-  ScannedBC = "";
+  transact_Withdraw = false;
+  transact_Deposit = false;
 
-  flag_print = false;
-  flag_print2 = false;
-  flag_print3 = false;
+  display_flag = false;
 
-  cardNum = "";
+  DoneCount = 0;
+  DrawerOfConcern = 0;
+  lcd.clear();
 }
